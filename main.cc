@@ -2,9 +2,11 @@
 // Simple tlb implementation for CS5600
 // Author: Hank Bao
 
+#include <cassert>
 #include <cstdio>
 #include <cstdlib>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -57,6 +59,31 @@ auto split_string(const std::string& s, const std::string& delimiter) -> std::ve
     return result;
 }
 
+auto begins_with(const std::string& s, const std::string& prefix) -> bool {
+    return s.length() >= prefix.length() ? s.compare(0, prefix.length(), prefix) == 0 : false;
+}
+
+auto str_to_num(const std::string& s) -> uint32_t {
+    assert(!s.empty());
+
+    int base = 10;
+    if (begins_with(s, "0x") || begins_with(s, "0X")) {
+        base = 16;
+    } else if (begins_with(s, "0b") || begins_with(s, "0B")) {
+        base = 2;
+    } else if (begins_with(s, "0")) {
+        base = 8;
+    }
+
+    return std::strtoul(s.c_str(), nullptr, base);
+}
+
+auto num_to_str_hex(uint32_t n) -> std::string {
+    std::stringstream ss;
+    ss << "0x" << std::hex << n;
+    return ss.str();
+}
+
 auto policy_to_string(const Policy& policy) -> std::string {
     switch (policy) {
         case Policy::FIFO:
@@ -69,7 +96,7 @@ auto policy_to_string(const Policy& policy) -> std::string {
 }
 
 auto parse_page_size(const std::string& str) -> uint32_t {
-    size_t size = std::stoi(str);
+    uint32_t size = str_to_num(str);
     if (size <= 0 || (size & (size - 1)) != 0) {
         std::fprintf(stderr, "Invalid page size: %s\n", str.c_str());
         print_usage(true);
@@ -79,7 +106,7 @@ auto parse_page_size(const std::string& str) -> uint32_t {
 }
 
 auto parse_tlb_size(const std::string& str) -> uint32_t {
-    size_t size = std::stoi(str);
+    uint32_t size = str_to_num(str);
     if (size <= 0) {
         std::fprintf(stderr, "Invalid tlb size: %s\n", str.c_str());
         print_usage(true);
@@ -89,7 +116,7 @@ auto parse_tlb_size(const std::string& str) -> uint32_t {
 }
 
 auto parse_cost(const std::string& str) -> uint32_t {
-    size_t cost = std::stoi(str);
+    uint32_t cost = str_to_num(str);
     if (cost <= 0) {
         std::fprintf(stderr, "Invalid cost: %s\n", str.c_str());
         print_usage(true);
@@ -111,8 +138,8 @@ auto parse_policy(const std::string& policy) -> Policy {
     }
 }
 
-auto parse_addrs(const std::string& addrs) -> std::vector<size_t> {
-    auto addresses = std::vector<size_t>{};
+auto parse_addrs(const std::string& addrs) -> std::vector<uint32_t> {
+    auto addresses = std::vector<uint32_t>{};
 
     auto strlist = split_string(addrs, ",");
     for (const auto& str : strlist) {
@@ -120,7 +147,7 @@ auto parse_addrs(const std::string& addrs) -> std::vector<size_t> {
             std::fprintf(stderr, "Invalid address: <empty>. Skipped.\n");
             continue;
         } else {
-            size_t addr = std::stoi(str);
+            uint32_t addr = str_to_num(str);
             if (addr <= 0) {
                 std::fprintf(stderr, "Invalid address: %s\n", str.c_str());
                 print_usage(true);
@@ -133,13 +160,13 @@ auto parse_addrs(const std::string& addrs) -> std::vector<size_t> {
     return addresses;
 }
 
-auto addrs_to_string(const std::vector<size_t>& addrs) -> std::string {
+auto addrs_to_string(const std::vector<uint32_t>& addrs) -> std::string {
     if (addrs.empty()) {
         return "<empty>";
     } else {
         std::string result;
         for (const auto& addr : addrs) {
-            result += std::to_string(addr) + ",";
+            result += num_to_str_hex(addr) + ",";
         }
 
         return result.substr(0, result.length() - 1);
@@ -155,8 +182,8 @@ auto main(int argc, char** argv) -> int {
     uint32_t pagetable_cost = 100;
     Policy tlb_policy = Policy::FIFO;
     Policy tlb_l2_policy = Policy::LRU;
-    std::vector<size_t> access{};
-    std::vector<size_t> prefetches{};
+    std::vector<uint32_t> access{};
+    std::vector<uint32_t> prefetches{};
 
     int opt;
     struct option long_options[] = {
