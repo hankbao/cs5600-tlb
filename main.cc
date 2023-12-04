@@ -142,9 +142,22 @@ auto main(int argc, char** argv) -> int {
         }
     }
 
+    uint32_t hits = 0;
+    uint32_t misses = 0;
+    uint32_t total_cost = 0;
+
     for (const auto& addr : access) {
-        mmu->access(addr, false);
+        auto result = mmu->access(addr, false);
+        if (result.first) {
+            hits += 1;
+        } else {
+            misses += 1;
+        }
+        total_cost += result.second;
     }
+
+    std::printf("\nFINALSTATS hits %d, misses %d, hitrate %.2f, total cost %uns\n",
+                hits, misses, hits / (float)(hits + misses), total_cost);
 
     return EXIT_SUCCESS;
 }
