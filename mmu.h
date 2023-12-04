@@ -21,7 +21,7 @@ class Mmu {
           offset_bits_{static_cast<size_type>(std::log2(page_size))} {}
     ~Mmu() = default;
 
-    auto access(addr_type vaddr) -> std::pair<addr_type, time_type>;
+    auto access(addr_type vaddr, bool prefetching) -> std::pair<addr_type, time_type>;
 
    private:
     auto access_tlb(addr_type vaddr) -> std::optional<std::pair<addr_type, time_type>>;

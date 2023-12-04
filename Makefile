@@ -6,14 +6,17 @@ all: tlb
 clean:
 	rm -f tlb *.o
 
-tlb: main.o mmu.o tlb_impl.o policy_fifo.o policy_lru.o policy_rand.o
-	$(CC) $(CXXFLAGS) -o tlb main.o mmu.o tlb_impl.o policy_fifo.o policy_lru.o policy_rand.o
+tlb: main.o mmu.o tlb_impl.o policy_fifo.o policy_lru.o policy_rand.o utils.o
+	$(CC) $(CXXFLAGS) -o tlb main.o mmu.o tlb_impl.o policy_fifo.o policy_lru.o policy_rand.o utils.o
 
-main.o: main.cc mmu.h policy.h policy_fifo.h policy_lru.h policy_rand.h tlb.h tlb_impl.h tlb_null.h
+main.o: main.cc mmu.h policy.h policy_fifo.h policy_lru.h policy_rand.h tlb.h tlb_impl.h tlb_null.h utils.h
 	$(CC) $(CXXFLAGS) -c main.cc
 
 mmu.o: mmu.cc mmu.h tlb.h def.h
 	$(CC) $(CXXFLAGS) -c mmu.cc
+
+utils.o: utils.cc
+	$(CC) $(CXXFLAGS) -c utils.cc
 
 tlb_impl.o: tlb_impl.cc tlb_impl.h tlb.h policy.h def.h
 	$(CC) $(CXXFLAGS) -c tlb_impl.cc
