@@ -2,6 +2,8 @@
 // MMU simulator implementation
 // Author: Hank Bao
 
+#include <cstdio>
+
 #include "mmu.h"
 
 auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<addr_type, time_type> {
@@ -15,8 +17,15 @@ auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<addr_type, time
     auto cost = result.second;
     auto paddr = (pfn << offset_mask_) | offset;
 
+    bool hit = true;
     if (!attempt.has_value()) {
+        hit = false;
         tlb_->insert(vpn, pfn, true);
+    }
+
+    if (!prefetching) {
+        std::printf("MMU access: %s, VADDR=0x%08x, VPN=%u, OFFSET=0x%08x, PFN=%u, PADDR=0x%08x COST=%u\n",
+                    hit ? "HIT" : "MISS", vaddr, vpn, offset, pfn, paddr, cost);
     }
 
     return std::make_pair(paddr, cost);

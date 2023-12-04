@@ -2,6 +2,11 @@
 // Utilities to handle I/O and display with conversion support.
 // Author: Hank Bao
 
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
+
 #include "utils.h"
 
 [[noreturn]] auto print_usage(bool onerror) -> void {
