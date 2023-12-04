@@ -6,7 +6,7 @@
 
 #include "mmu.h"
 
-auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<addr_type, time_type> {
+auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<bool, time_type> {
     auto vpn = get_vpn(vaddr);
     auto offset = get_offset(vaddr);
 
@@ -28,7 +28,7 @@ auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<addr_type, time
                     hit ? "HIT" : "MISS", vaddr, vpn, offset, pfn, paddr, cost);
     }
 
-    return std::make_pair(paddr, cost);
+    return std::make_pair(hit, cost);
 }
 
 auto Mmu::access_tlb(addr_type vaddr) -> std::optional<std::pair<addr_type, time_type>> {
