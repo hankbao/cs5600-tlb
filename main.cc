@@ -156,8 +156,8 @@ auto main(int argc, char** argv) -> int {
         total_cost += result.second;
     }
 
-    std::printf("\nFINALSTATS hits %d, misses %d, hitrate %.2f, total cost %uns\n",
-                hits, misses, hits / (float)(hits + misses), total_cost);
+    std::printf("\nFINALSTATS hits %d, misses %d, hitrate %.2f, total cost %uns, average cost %.2fns\n",
+                hits, misses, hits / (float)(hits + misses), total_cost, total_cost / (float)(hits + misses));
 
     return EXIT_SUCCESS;
 }
