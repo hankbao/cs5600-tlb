@@ -75,6 +75,9 @@ auto policy_to_string(const Policy& policy) -> std::string {
             return "LRU";
         case Policy::Random:
             return "RAND";
+        default:
+            std::fprintf(stderr, "Unknown policy\n");
+            std::abort();
     }
 }
 
