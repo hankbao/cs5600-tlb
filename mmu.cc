@@ -26,6 +26,9 @@ auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<bool, time_type
     if (!prefetching) {
         std::printf("MMU access: %s, VADDR=0x%08x, VPN=%u, OFFSET=0x%08x, PFN=%u, PADDR=0x%08x COST=%uns\n",
                     hit ? "HIT" : "MISS", vaddr, vpn, offset, pfn, paddr, cost);
+    } else {
+        std::printf("TLB prefetch: %s, VADDR=0x%08x, VPN=%u, PFN=%u\n",
+                    hit ? "HIT" : "MISS", vaddr, vpn, pfn);
     }
 
     return std::make_pair(hit, cost);
