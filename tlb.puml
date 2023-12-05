@@ -1,0 +1,150 @@
+@startuml
+
+
+
+
+
+/' Objects '/
+
+class Mmu {
+	+Mmu(std::unique_ptr<Tlb>&& tlb, time_type pagetable_cost, size_type page_size)
+	+~Mmu()
+	+access(addr_type vaddr, bool prefetching) : auto
+	-access_pagetable(size_type vpn) : auto
+	-access_tlb(size_type vpn) : auto
+	-fake_pagetable_map(size_type vpn) : auto
+	-get_offset(addr_type vaddr) : auto
+	-get_vpn(addr_type vaddr) : auto
+	-offset_mask_ : const addr_type
+	-offset_bits_ : const size_type
+	-pagetable_cost_ : const time_type
+	-tlb_ : std::unique_ptr<Tlb>
+}
+
+
+abstract class ReplacementPolicy {
+	+ReplacementPolicy()
+	+~ReplacementPolicy()
+	+{abstract} replace(std::map<size_type, TlbEntry>& cache, size_type cache_size, size_type vpn, size_type pfn, bool valid) : auto
+}
+
+
+class ReplacementPolicyFifo {
+	+ReplacementPolicyFifo(size_type capacity)
+	+~ReplacementPolicyFifo()
+	+replace(std::map<size_type, TlbEntry>& cache, size_type cache_size, size_type vpn, size_type pfn, bool valid) : auto
+	-queue_ : std::vector<size_type>
+}
+
+
+class ReplacementPolicyLru {
+	+ReplacementPolicyLru(size_type capacity)
+	+~ReplacementPolicyLru()
+	+replace(std::map<size_type, TlbEntry>& cache, size_type cache_size, size_type vpn, size_type pfn, bool valid) : auto
+	-lru_ : lru_cache<size_type, TlbEntry>
+}
+
+
+class ReplacementPolicyRand {
+	+ReplacementPolicyRand(size_type capacity)
+	+~ReplacementPolicyRand()
+	+replace(std::map<size_type, TlbEntry>& cache, size_type cache_size, size_type vpn, size_type pfn, bool valid) : auto
+	-queue_ : std::vector<size_type>
+}
+
+
+abstract class Tlb {
+	+Tlb()
+	+~Tlb()
+	+{abstract} insert(size_type vpn, size_type pfn, bool valid) : auto
+	+{abstract} lookup(size_type vpn) : auto
+}
+
+
+class TlbImpl <template<typename RP>> {
+	+TlbImpl(const time_type cost, const size_type capacity, std::unique_ptr<Tlb>&& next)
+	+~TlbImpl()
+	+insert(size_type vpn, size_type pfn, bool valid) : auto
+	+lookup(size_type vpn) : auto
+	-capacity_ : const size_t
+	-cost_ : const time_type
+	-cache_ : std::map<size_type, TlbEntry>
+	-next_ : std::unique_ptr<Tlb>
+}
+
+
+class TlbNull {
+	+TlbNull()
+	+~TlbNull()
+	+insert(size_type vpn, size_type pfn, bool valid) : auto
+	+lookup(size_type vpn) : auto
+}
+
+
+class lru_cache <template<class Key, class Value>> {
+	+lru_cache(size_t capacity)
+	+~lru_cache()
+	+contains(const key_type& key) : bool
+	+empty() : bool {query}
+	-m_list : list_type
+	-m_map : map_type
+	+capacity() : size_t {query}
+	-m_capacity : size_t
+	+size() : size_t {query}
+	+insert(const key_type& key, const value_type& value) : std::optional<std::pair<key_type , value_type>>
+	+get(const key_type& key) : std::optional<value_type>
+	-evict() : std::pair<key_type , value_type>
+	+clear() : void
+}
+
+
+enum Policy {
+	FIFO
+	LRU
+	Random
+}
+
+
+
+
+
+/' Inheritance relationships '/
+
+.ReplacementPolicy <|-- .ReplacementPolicyFifo
+
+
+.ReplacementPolicy <|-- .ReplacementPolicyLru
+
+
+.ReplacementPolicy <|-- .ReplacementPolicyRand
+
+
+.Tlb <|-- .TlbImpl
+
+
+.Tlb <|-- .TlbNull
+
+
+
+
+
+/' Aggregation relationships '/
+
+.Mmu *-- .Tlb
+
+
+.ReplacementPolicyLru *-- .lru_cache
+
+
+.TlbImpl *-- .Tlb
+
+
+
+
+
+
+/' Nested objects '/
+
+
+
+@enduml
