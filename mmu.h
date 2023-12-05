@@ -24,12 +24,12 @@ class Mmu {
     auto access(addr_type vaddr, bool prefetching) -> std::pair<bool, time_type>;
 
    private:
-    auto access_tlb(addr_type vaddr) -> std::optional<std::pair<addr_type, time_type>>;
-    auto access_pagetable(addr_type vaddr) -> std::pair<addr_type, time_type>;
+    auto access_tlb(size_type vpn) -> std::optional<std::pair<addr_type, time_type>>;
+    auto access_pagetable(size_type vpn) -> std::pair<addr_type, time_type>;
 
     auto get_vpn(addr_type vaddr) -> size_type;
     auto get_offset(addr_type vaddr) -> size_type;
-    auto fake_pagetable_map(addr_type vpn) -> size_type;
+    auto fake_pagetable_map(size_type vpn) -> size_type;
 
    private:
     std::unique_ptr<Tlb> tlb_;

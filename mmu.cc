@@ -31,18 +31,13 @@ auto Mmu::access(addr_type vaddr, bool prefetching) -> std::pair<bool, time_type
     return std::make_pair(hit, cost);
 }
 
-auto Mmu::access_tlb(addr_type vaddr) -> std::optional<std::pair<addr_type, time_type>> {
-    return tlb_->lookup(get_vpn(vaddr));
+auto Mmu::access_tlb(size_type vpn) -> std::optional<std::pair<addr_type, time_type>> {
+    return tlb_->lookup(vpn);
 }
 
-auto Mmu::access_pagetable(addr_type vaddr) -> std::pair<addr_type, time_type> {
-    auto vpn = get_vpn(vaddr);
-    auto offset = get_offset(vaddr);
-
+auto Mmu::access_pagetable(size_type vpn) -> std::pair<addr_type, time_type> {
     auto pfn = fake_pagetable_map(vpn);
-    auto paddr = (pfn << offset_mask_) | offset;
-
-    return std::make_pair(paddr, pagetable_cost_);
+    return std::make_pair(pfn, pagetable_cost_);
 }
 
 auto Mmu::get_vpn(addr_type vaddr) -> size_type {
@@ -54,6 +49,6 @@ auto Mmu::get_offset(addr_type vaddr) -> size_type {
 }
 
 // map a virtual page number to a physical frame number
-auto Mmu::fake_pagetable_map(addr_type vpn) -> size_type {
+auto Mmu::fake_pagetable_map(size_type vpn) -> size_type {
     return vpn + 0x2000;
 }
