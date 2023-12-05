@@ -12,16 +12,16 @@
 [[noreturn]] auto print_usage(bool onerror) -> void {
     std::puts("Usage: tlb [OPTIONS]...\n");
     std::puts("Supported options:");
-    std::puts("-s, --size=PAGESIZE\n\tsize of a page in bytes, must be a power of 2");
-    std::puts("-t, --tlb=TLBSIZE\n\tsize of the TLB L1");
+    std::puts("-s, --size=PAGESIZE\n\tsize of a page in bytes, must be a power of 2, default to 4096");
+    std::puts("-t, --tlb=TLBSIZE\n\tsize of the TLB L1, default to 64");
     std::puts("-c, --cost=TLBCOST\n\tcost of lookup in the TLB L1, default to 5 nano seconds");
-    std::puts("-l, --tlb2=TLBSIZE2\n\tsize of the TLB L2");
+    std::puts("-l, --tlb2=TLBSIZE2\n\tsize of the TLB L2, disable by setting to 0, default to 0");
     std::puts("-d, --cost2=TLBCOST2\n\tcost of lookup in the TLB L2, default to 20 nano seconds");
     std::puts("-e, --costpt=PTBCOST\n\tcost of lookup in the Page Table, default to 100 nano seconds");
-    std::puts("-p, --policy=TLBPOLICY\n\treplacement policy for TLB L1 (FIFO, LRU, RAND)");
-    std::puts("-q, --policy2=TLBPOLICY2\n\treplacement policy for TLB L2 (FIFO, LRU, RAND)");
-    std::puts("-a, --access=ADDRLIST\n\ta set of comma-separated addresses to access");
-    std::puts("-f, --prefetch=PREFETCHLIST\n\ta set of comma-separated addresses to prefetch");
+    std::puts("-p, --policy=TLBPOLICY\n\treplacement policy for TLB L1 (FIFO, LRU, RAND), default to FIFO");
+    std::puts("-q, --policy2=TLBPOLICY2\n\treplacement policy for TLB L2 (FIFO, LRU, RAND), default to LRU");
+    std::puts("-a, --access=ADDRLIST\n\ta set of comma-separated addresses to access, required");
+    std::puts("-f, --prefetch=PREFETCHLIST\n\ta set of comma-separated addresses to prefetch, default to none");
     std::puts("-h, --help\n\tprint usage message and exit");
 
     ::exit(onerror ? EXIT_FAILURE : EXIT_SUCCESS);
